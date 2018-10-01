@@ -1,0 +1,179 @@
+:root {
+  --full-WH: 60vw;
+  --cell-WH: 100%;
+  --grid-rows: 5;
+  --grid-cols: 5;
+  --fen-section-cols: 8;
+  --fen-section-rows: 1;
+  --fen-inner-cols: 8;
+  --fen-inner-rows: 1;
+  --color-A: #232323;
+  --color-B: #454545;
+  --color-active-A: #323232;
+  --color-active-B: #545454;
+  --color-select-A: #4583a6;
+  --color-select-B: #7dc8f3;
+  --color-highlight: rgba(255, 255, 255, 0.125);
+  --color-team0: #cccccc;
+  --color-active-team0: #fcfcfc;
+  --color-team1: #c62c2c;
+  --color-active-team1: #ed2929;
+  background-color: #323232;
+}
+
+#app {
+  justify-content: center;
+  margin-top: 2rem;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+}
+
+.fenGrid {
+  box-sizing: border-box;
+  /* border: 2px solid blue; */
+  margin: .5rem 0px 0px 0px;
+  width: var(--full-WH);
+  height: 2rem;
+  display: grid;
+  grid-row-gap:    0px;
+  grid-column-gap: 0px;
+  grid-template-rows:    repeat(var(--fen-section-rows), 1fr);
+  grid-template-columns: repeat(var(--fen-section-cols), 1fr);
+}
+
+.fenLetter {
+  padding-top: .25rem;
+  text-align: center;
+  font-size: 1rem;
+  box-sizing: border-box;
+  justify-self: center;
+  align-self: center;
+  width: 100%;
+  height: 1rem;
+  /* height: 100%; */
+  cursor: pointer;
+  background-color: transparent;
+}
+.fenLetter:hover {
+  background-color: rgba(255, 255, 255, 0.25);
+}
+
+.fenSection {
+  overflow: hidden;
+  padding: 0px .25rem;
+  border: 2px solid var(--color-border);
+  box-sizing: border-box;
+  border-radius: .5rem;
+  width: 100%;
+  display: grid;
+  grid-row-gap:    0px;
+  grid-column-gap: 0px;
+  grid-template-rows:    repeat(var(--fen-inner-rows), 1fr);
+  grid-template-columns: repeat(var(--fen-inner-cols), 1fr);
+}
+
+.fenput {
+  color: #cccccc;
+  border: 2px solid transparent;
+  width: 100%;
+  font-family: Rubik;
+  background-color: #232323;
+  color:
+}
+
+.note {
+  /* cursor: default; */
+  width: var(--full-WH);
+  /* user-select: none; */
+  /* text-shadow: 0px 2px 2px rgba(0, 0, 0, 0.25); */
+}
+
+.anno {
+  /* border: 2px solid blue; */
+  margin-top: .5rem;
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  font-size: 1.25rem;
+}
+
+/* .character {
+  align-self: center;
+  justify-self: center;
+  width: calc(var(--cell-WH) * .8);
+  height: calc(var(--cell-WH) * .8);
+  background-color: red;
+  border-radius: var(--cell-WH);
+} */
+
+.char {
+  padding-top: 10%;
+  text-align: center;
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  text-shadow: .125rem .125rem .125rem rgba(0, 0, 0, 0.25);
+  transition:  all 80ms var(--quart) 20ms;
+}
+
+.white {
+  color: var(--color-team0);
+}
+
+.red {
+  color: var(--color-team1);
+}
+
+.grid {
+  border: 2px solid #373737;
+  width: var(--full-WH);
+  height: var(--full-WH);
+  cursor: pointer;
+  user-select: none;
+  display: grid;
+  grid-row-gap:    0px;
+  grid-column-gap: 0px;
+  grid-template-rows:    repeat(var(--grid-rows), 1fr);
+  grid-template-columns: repeat(var(--grid-cols), 1fr);
+}
+
+[class^="grid-cell"] {
+  width: var(--cell-WH);
+  height: var(--cell-WH);
+  box-sizing: border-box;
+}
+
+.grid-cell-idleA, .grid-cell-idleB {
+  border: 2px solid transparent;
+}
+.grid-cell-activeA, .grid-cell-activeB {
+  border: 2px solid white;
+}
+[class*="A"] {
+  transition:  all 80ms var(--quart) 20ms;
+  background-color: var(--color-A);
+}
+[class*="B"] {
+  background-color: var(--color-B);
+}
+
+[class*="A"]:hover {
+  background-color: var(--color-active-A);
+}
+[class*="B"]:hover {
+  background-color: var(--color-active-B);
+}
+
+[class*="A"]:hover > .white, [class*="B"]:hover > .white {
+  color: var(--color-active-team0);
+  text-shadow: .25rem .125rem .25rem rgba(0, 0, 0, 0.25);
+}
+
+[class*="A"]:hover > .red, [class*="B"]:hover > .red {
+  color: var(--color-active-team1);
+  text-shadow: .25rem .125rem .25rem rgba(0, 0, 0, 0.25);
+}
