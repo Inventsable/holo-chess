@@ -110,12 +110,54 @@
   border-radius: var(--cell-WH);
 } */
 
-.char {
-  padding-top: 10%;
-  text-align: center;
-  box-sizing: border-box;
+[class*="BarWrap"] {
+  width: 80%;
+  height: .25rem;
+}
+
+.healthBarWrap {
+  border: 2px solid red;
+  height: 0px;
+  width: 100%;
+  margin: .25rem 0px;
+}
+
+.invisibleStats {
+  border: 2px solid transparent;
+  width: 100%;
+  height: 0px;
+}
+
+.manaBarWrap {
+  border: 2px solid blue;
+  height: 0px;
+  width: 100%;
+}
+
+.charWrap {
+  /* border: 2px solid black; */
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  /* border: 2px solid blue; */
   width: 100%;
   height: 100%;
+  box-sizing: border-box;
+}
+
+.statWrap {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  align-items: center;
+  width: 80%;
+  /* border: 2px solid green; */
+}
+
+.char {
+  /* padding-top: 10%; */
+  text-align: center;
   text-shadow: .125rem .125rem .125rem rgba(0, 0, 0, 0.25);
   transition:  all 80ms var(--quart) 20ms;
 }
@@ -146,6 +188,22 @@
   height: var(--cell-WH);
   box-sizing: border-box;
 }
+
+.grid-cell-hitA, .grid-cell-hitB {
+  border: 2px solid red;
+}
+/* .grid-cell-hitA, .grid-cell-hitB {
+  border: 2px solid transparent;
+} */
+
+
+.grid-cell-routeA, .grid-cell-routeB {
+  border: 2px solid green;
+}
+.grid-cell-noPathA, .grid-cell-noPathB {
+  border: 2px solid transparent;
+}
+
 
 .grid-cell-idleA, .grid-cell-idleB {
   border: 2px solid transparent;

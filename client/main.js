@@ -84,40 +84,62 @@ Vue.component('anno', {
   mounted() {
     var grid = this.$root.$children[0];
     var prevFEN = localStorage.getItem('masterFEN');
-    // console.log(localStorage);
-    console.log('previous was ' + prevFEN);
-    // this.realFEN = localStorage.getItem('masterFEN')
-    this.realFEN = grid.prettyFEN('none', grid.FEN)
-    // this.realFEN = grid.prettyFEN('local', prevFEN);
+    console.log('previously:\r\n' + prevFEN);
+    // this.realFEN = grid.prettyFEN('none', grid.FEN)
+    this.realFEN = grid.prettyFEN('none', prevFEN);
     this.arrFen = this.$root.uglified();
     var ugArr = this.annoSections();
     this.uglyAnnoSections = ugArr[0];
-    // console.log(this.uglyAnnoSections);
     Event.$on('resetAnno', this.updateAnno);
-    console.log('anno online');
-    // this.testArrs();
   }
 })
 
 Vue.component('character', {
   props: ['profile'],
   template: `
-    <span
-      :class="setIcon(profile)">
-    </span>
+    <div
+      class="charWrap">
+      <span
+        :class="setIcon(profile)">
+      </span>
+      <div class="statWrap">
+        <div :class="statClass('h', profile.health)"></div>
+        <div :class="statClass('m', profile.mana)"></div>
+      </div>
+    </div>
   `,
+  // :ondragstart="masterDragStart"
+  // draggable="true"
   data() {
     return {
       stats: [],
+      showStats: false,
       names: ['king', 'queen', 'bishop', 'knight', 'rook', 'pawn'],
     }
   },
   methods: {
+    statClass: function(type, num) {
+      // var hBar = this.$el.children[1].children[0];
+      // hBar.style.width = num * 10 + '%';
+      var res = '';
+      if (this.showStats) {
+        if (/h/.test(type)) {
+          res += 'healthBarWrap'
+        } else if (/m/.test(type)){
+          res += 'manaBarWrap'
+        } else {
+
+        }
+      } else {
+        res += 'invisibleStats'
+      }
+      return res;
+    },
     setIcon: function(char) {
       return char.color + ' ' + this.icon(char)
     },
     icon: function(char) {
-      return 'char fa fa-4x fa-chess-' + char.name;
+      return 'char fa fa-3x fa-chess-' + char.name;
     }
   },
 })
@@ -129,14 +151,18 @@ Vue.component('chessboard', {
       v-for="cell in grid"
       :class="tileType(cell)"
       @mousedown="setFocus(cell.index)"
-      @mouseover="ifDrag(cell.index, $event)">
+      @mouseover="ifDrag(cell.index, $event)"
+      @mouseout="hideRoutes">
         <span v-if="showIndex">{{cell.index}}</span>
         <character v-if="cell.hasChar" :profile="cell.Char"></character>
     </div>
   </div>
   `,
+  // :ondrop="masterOnDrop"
+  // :ondragover="masterDragOver"
   data() {
     return {
+      endx: 0,
       msg: 'Placeholder',
       showIndex: false,
       grid: [],
@@ -152,7 +178,6 @@ Vue.component('chessboard', {
     total: function() {
       return this.rows * this.cols;
     },
-
     // localFEN
     FEN: function() {
       var res = '';
@@ -180,14 +205,169 @@ Vue.component('chessboard', {
     },
   },
   methods: {
+    getRange: function(index) {
+      var minmax = this.getMinMaxRangeOfRows();
+      var range = 'none';
+      for (var i = 0; i < minmax.length; i++) {
+        if ((index >= minmax[i][0]) && (index <= minmax[i][1])) {
+          range = i;
+          break;
+        } else {
+          continue;
+        }
+      };
+      return range;
+    },
+    getRowCol: function(index) {
+      var row = this.getRange(index);
+      var col = index % this.rows;
+      var arrs = this.$root.uglyArrs;
+      var verified = arrs[row][col];
+      console.log(`Verifying ${index}: ${verified}`);
+      return [row, col]
+    },
+    potentialMoves: function(index, char) {
+      var arrs = this.$root.uglyArrs;
+      var pos = this.getRowCol(index);
+      var row = pos[0], col = pos[1], targ;
+      var routes = [], hits = [];
+      if (char.name == 'pawn') {
+          if (char.color == 'red') {
+            if (row == 6) {
+              targ = index - this.rows - this.rows;
+              // if (this.grid[targ].hasChar)
+              //   hits.push(targ);
+              // else
+                routes.push(targ);
+            }
+            targ = index - this.rows;
+            // if (this.grid[targ].hasChar)
+            //   hits.push(targ);
+            // else
+              routes.push(targ);
+          } else {
+            if (row == 1) {
+              targ = index + this.rows + this.rows;
+              routes.push(targ)
+            }
+            targ = index + this.rows;
+            routes.push(targ);
+          }
+      } else if (char.name == 'rook') {
+        for (var i = 0; i < arrs[row].length; i++) {
+          if (i !== row) {
+            var currY = col + (this.rows * i);
+// // // // // COLLISION DETECTION // + PATH-BLOCK
+            // if (this.grid[currY].hasChar)
+            //   hits.push(currY);
+            // else
+              routes.push(currY);
+          }
+          var currX = index + col * -1 + i;
+          if (currX !== index)
+            routes.push(currX)
+        }
+      } else if (char.name == 'knight') {
+
+        var y1 = [
+          index - this.rows - this.rows - 1,
+          index - this.rows - this.rows + 1,
+        ];
+        var y2 = [
+          index + this.rows + this.rows - 1,
+          index + this.rows + this.rows + 1,
+        ];
+        var x1 = [
+          index - 2 - this.rows,
+          index - 2 + this.rows,
+        ];
+        var x2 = [
+          index + 2 - this.rows,
+          index + 2 + this.rows,
+        ];
+        for (var i = 0; i < y1.length; i++) {
+          if (col > 1) {
+            if (((i < 1) && (row > 1)) || ((i > 0) && (row < 7))) {
+              targ = x1[i];
+              routes.push(targ);
+            }
+          }
+
+          if (col < 6) {
+            if (((i < 1) && (row > 1)) || ((i > 0) && (row < 7))) {
+              targ = x2[i];
+              routes.push(targ);
+            }
+          }
+          if (row > 1) {
+            if (((i < 1) && (col > 0)) || ((i > 0) && (col < 7))) {
+              targ = y1[i];
+              routes.push(targ);
+            }
+          }
+          if (row < 6) {
+            if (((i < 1) && (col > 1)) || ((i > 0) && (col < 7))) {
+              targ = y2[i];
+              routes.push(targ);
+            }
+          }
+        }
+        // targ = index - ;
+        // routes.push(targ);
+        // targ = index - this.rows - this.rows + 1;
+        // routes.push(targ);
+      }
+      console.log(`Potential move from ${index} to ${routes}`);
+      this.showRoutes(routes);
+      // this.showHits(hits)
+      // return route;
+    },
+    showRoutes: function(arrs) {
+      for (var i = 0; i < arrs.length; i++) {
+        var targ = arrs[i];
+        this.grid[targ].isRoute = true;
+      }
+    },
+    hideRoutes: function() {
+      for (var i = 0; i < this.grid.length; i++) {
+        this.grid[i].isRoute = false;
+      }
+    },
+    findPath: function(origin) {
+      // var origin = this.findActive();
+      var targ = this.grid[origin];
+      this.endx = origin;
+      // console.log(origin);
+      if (targ.hasChar) {
+        var char = this.grid[origin].Char;
+        this.potentialMoves(origin, char)
+      } else {
+        console.log('No character');
+      }
+    },
+    findActive: function() {
+      var match = false;
+      for (var i = 0; i < this.grid.length; i++) {
+        if (this.grid[i].isActive) {
+          match = i;
+          break;
+        }
+      }
+      return match;
+    },
+    masterDragOver: function(evt) {
+      // this.$root.drop_handler(evt);
+    },
+    masterOnDrop: function(evt) {
+      // this.$root.dragover_handler(evt);
+    },
     prettyFEN: function(where, str) {
       var self = this, ugly = '', pretty = '', prettyResult = '';
       var rows = [];
-      if (where == 'local')
+      // if (where == 'local')
         rows = this.$root.chunkString(str, self.rows);
-        // rows = this.$root.chunkString(this.$root.masterFEN, this.$root.masterRows);
-      else
-        rows = this.$root.chunkString(self.FEN, self.rows);
+      // else
+      //   rows = this.$root.chunkString(self.FEN, self.rows);
       for (var i = 0; i < rows.length; i++) {
         var targ = rows[i];
         var matches = targ.match(self.$root.rx.unique);
@@ -216,7 +396,20 @@ Vue.component('chessboard', {
     tileType: function(cell) {
       var style = '';
       style += cell.isActive ? ' grid-cell-active' : ' grid-cell-idle'
-      var minmax = this.getMinMaxRangeOfRows(cell);
+      if (cell.isRoute && cell.hasChar) {
+        var unit = this.endx;
+        var player = this.grid[unit].Char;
+        if (cell.Char.color !== player.color) {
+          style += cell.isRoute ? ' grid-cell-hit' : ' grid-cell-noPath'
+        } else {
+          style += cell.isRoute ? ' grid-cell-noPath' : ' grid-cell-noPath'
+        }
+        // if (cell.Char.)
+      } else {
+        style += cell.isRoute ? ' grid-cell-route' : ' grid-cell-noPath'
+      }
+      // style += cell.isHit ? ' grid-cell-hit' : ' grid-cell-noHit'
+      var minmax = this.getMinMaxRangeOfRows();
       var range = 'none';
       for (var i = 0; i < minmax.length; i++) {
         if ((cell.index >= minmax[i][0]) && (cell.index <= minmax[i][1])) {
@@ -239,7 +432,7 @@ Vue.component('chessboard', {
       }
       return style;
     },
-    getMinMaxRangeOfRows(cell) {
+    getMinMaxRangeOfRows() {
       var source = this.rows;
       var ranges = [];
       for (var i = 0; i < this.rows; i++) {
@@ -249,8 +442,7 @@ Vue.component('chessboard', {
       }
       return ranges;
     },
-    ifDrag: function(i, evt) {
-      this.$root.parseModifiers(evt);
+    multiSelection: function(i, evt) {
       if ((this.$root.isDragging) && (!this.grid[i].isActive)) {
         console.log(this.$root.Shift);
         if (this.$root.Shift)
@@ -261,10 +453,17 @@ Vue.component('chessboard', {
         this.grid[i].isActive = false;
       }
     },
+    ifDrag: function(i, evt) {
+      this.$root.parseModifiers(evt);
+      // if ((this.$root.Shift) && (!this.grid[i].isActive))
+      if (!this.grid[i].isActive)
+        this.findPath(i);
+    },
     setFocus: function(i) {
       this.clearFocus();
       this.grid[i].isActive = true;
       console.log(i + ' was clicked');
+      this.findPath(i);
     },
     isEven: function(n) {
        return n % 2 == 0;
@@ -287,6 +486,7 @@ Vue.component('chessboard', {
         var newCell = {
           isActive: false,
           isRoute: false,
+          isHit: false,
           hasChar: false,
           showIndex: true,
           Char: {
@@ -311,9 +511,15 @@ Vue.component('chessboard', {
       }
       return str;
     },
+    cleanGrid: function() {
+      for (var i = 0; i < this.grid.length; i++) {
+        this.grid[i].hasChar = false;
+      }
+    },
     setChars: function() {
       var str = this.$root.masterFEN;
       var self = this;
+      this.cleanGrid();
       for (var i = 0; i < str.length; i++) {
         var curr = str[i];
         var type = self.charFromFirst(curr);
@@ -321,10 +527,14 @@ Vue.component('chessboard', {
         if (self.$root.rx.isWord.test(curr)) {
           self.grid[i].hasChar = true;
           var first = curr.charAt(0);
+          self.grid[i].Char.health = 8;
+          self.grid[i].Char.mana = 8;
           if (self.$root.rx.lowercase.test(first)) {
             self.grid[i].Char.color = 'red';
+            self.grid[i].Char.team = 2;
           } else {
             self.grid[i].Char.color = 'white';
+            self.grid[i].Char.team = 1;
           }
           if (type !== 'zing') {
             self.grid[i].Char.name = type;
@@ -332,9 +542,11 @@ Vue.component('chessboard', {
             self.grid[i].Char.name = 'king'
           }
         } else {
-          self.grid[i].hasChar = false;
-          self.grid[i].Char.name = '1'
-          self.grid[i].Char.team = false;
+          // self.grid[i].Char.health = 0;
+          // self.grid[i].Char.mana = 0;
+          // self.grid[i].hasChar = false;
+          // self.grid[i].Char.name = '1'
+          // self.grid[i].Char.team = 0;
         }
       }
     },
@@ -388,11 +600,9 @@ Vue.component('chessboard', {
     this.updateGrid();
     this.assignChars();
     Event.$on('set', self.setChars)
-    Event.$on('highlightMatches', self.highlightGrid)
+    // Event.$on('highlightMatches', self.highlightGrid)
     Event.$on('resetGridFocus', self.clearFocus)
-    // this.setChars();
-    // console.log(this.FEN);
-    // console.log(this.prettyFEN);
+    Event.$on('playerPaths', self.highlightPath)
   }
 })
 
@@ -400,6 +610,7 @@ Vue.component('chessboard', {
 var app = new Vue({
   el: '#app',
   data: {
+    ticks: 0,
     masterFEN: '',
     masterRows: 8,
     prettyArrs: [],
@@ -426,7 +637,6 @@ var app = new Vue({
   },
   mounted: function () {
     var self = this;
-    // self.masterFEN =
     Event.$on('changeFEN', self.updateFEN)
     window.addEventListener('mousedown', function(evt) {
       self.parseModifiers(evt);
@@ -436,17 +646,44 @@ var app = new Vue({
       self.parseModifiers(evt);
       self.isDragging = false;
     });
-    console.log('app online');
     Event.$emit('changeFEN');
-    // console.log(this.getCSS('cell-WH'));
   },
   methods: {
+    // dragstart_handler: function(ev) {
+    //  console.log("dragStart");
+    //  // Change the source element's background color to signify drag has started
+    //  ev.currentTarget.style.backgroundColor = "red";
+    //  // Set the drag's format and data. Use the event target's id for the data
+    //  ev.dataTransfer.setData("text/plain", ev.target.id);
+    // },
+    // dragover_handler: function(ev) {
+    //  console.log("dragOver");
+    //  ev.preventDefault();
+    // },
+    // drop_handler: function(ev) {
+    //   console.log("Drop");
+    //   ev.preventDefault();
+    //   // Get the data, which is the id of the drop target
+    //   var data = ev.dataTransfer.getData("text");
+    //   ev.target.appendChild(document.getElementById(data));
+    //   // Clear the drag data cache (for all formats/types)
+    //   ev.dataTransfer.clearData();
+    // },
     updateFEN: function() {
-      this.masterFEN = this.uglified();
+      var targ = '';
       var storage = window.localStorage;
-      var targ = this.uglified();
-      console.log(storage);
-      console.log(targ);
+      if (this.$root.ticks < 1) {
+        console.log('First');
+        this.masterFEN = storage.getItem('masterFEN');
+        targ = storage.getItem('masterFEN');
+        this.$root.ticks++;
+      } else {
+        console.log('Else');
+        this.masterFEN = this.uglified();
+        targ = this.uglified();
+        this.$root.ticks++;
+      }
+
       storage.setItem('masterFEN', targ)
       Event.$emit('set');
       Event.$emit('resetAnno');
