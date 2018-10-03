@@ -390,6 +390,208 @@ Vue.component('chessboard', {
             if (this.grid[tempNE].hasChar)
               streamNE.push(tempNE)
         }
+      } else if (char.name == 'queen') {
+        var streamNW = [], streamSW = [], streamNE = [], streamSE = [];
+        var inBounds = true;
+        var tempNW = 0, tempNE = 0, tempSW = 0, tempSE = 0;
+        var streamX1 = [], streamX2 = [], streamY1 = [], streamY2 = [];
+        for (var E = 1; E <= col; E++) {
+          targ = index - E;
+          if (!streamX1.length) {
+            routes.push(targ)
+          }
+          if ((targ >= 0) && (this.grid[targ].hasChar)) {
+            streamX1.push(targ)
+          }
+        }
+        for (var W = 1; W < this.rows - col; W++) {
+          targ = index + W;
+          if (!streamX2.length) {
+            routes.push(targ)
+          }
+          if ((targ < this.total) && (this.grid[targ].hasChar)) {
+            streamX2.push(targ)
+          }
+        }
+        for (var N = 1; N < row + 1; N++) {
+          targ = index - (this.rows * N);
+          if (!streamY1.length) {
+            routes.push(targ)
+          }
+          if ((targ >= 0) && (this.grid[targ].hasChar)) {
+            streamY1.push(targ)
+          }
+        }
+        for (var S = 1; S < this.rows - row; S++) {
+          targ = index + (this.rows * S);
+          if (!streamY2.length) {
+            routes.push(targ)
+          }
+          if ((targ >= 0) && (this.grid[targ].hasChar)) {
+            streamY2.push(targ)
+          }
+        }
+        for (var nw = 0; nw < col; nw++) {
+          if (nw < 1) {
+            tempNW = index - this.rows - 1;
+            tempSW = index + this.rows - 1
+          } else {
+            tempNW = tempNW - this.rows - 1;
+            tempSW = tempSW + this.rows - 1;
+          }
+          if (!streamNW.length) {
+            inBounds = this.getRange(tempNW);
+            if ((row > 0) && (tempSW < this.total) && (inBounds)) {
+              routes.push(tempNW)
+            }
+          }
+          if (!streamSW.length) {
+            inBounds = this.getRange(tempSW);
+            console.log('SW is ' + inBounds);
+            if ((row < 7) && (tempSW < this.total) && (inBounds)) {
+              routes.push(tempSW)
+            }
+          }
+          if (tempSW < this.total)
+            if (this.grid[tempSW].hasChar)
+              streamSW.push(tempSW)
+          if (tempNW > 0)
+            if (this.grid[tempNW].hasChar)
+              streamNW.push(tempNW)
+        }
+        for (var ne = col + 1; ne < this.rows; ne++) {
+          if (ne == col + 1) {
+            tempNE = index - this.rows + 1;
+            tempSE = index + this.rows + 1
+          } else {
+            tempNE = tempNE - this.rows + 1;
+            tempSE = tempSE + this.rows + 1;
+          }
+          if (!streamNE.length) {
+            inBounds = this.getRange(tempNE);
+            if ((row > 0) && (tempNE > 0) && (inBounds)) {
+              routes.push(tempNE)
+            }
+          }
+          if (!streamSE.length) {
+            inBounds = this.getRange(tempSE);
+            console.log('SE is ' + inBounds);
+            if ((row < 7) && (tempSE < this.total) && (inBounds)) {
+              routes.push(tempSE)
+            }
+          }
+          if (tempSE < this.total)
+            if (this.grid[tempSE].hasChar)
+              streamSE.push(tempSE)
+          if (tempNE > 0)
+            if (this.grid[tempNE].hasChar)
+              streamNE.push(tempNE)
+        }
+      } else if (char.name == 'king') {
+        var streamNW = [], streamSW = [], streamNE = [], streamSE = [];
+        var inBounds = true;
+        var tempNW = 0, tempNE = 0, tempSW = 0, tempSE = 0;
+        var streamX1 = [], streamX2 = [], streamY1 = [], streamY2 = [];
+        for (var E = 1; E <= col; E++) {
+          targ = index - E;
+          if (!streamX1.length) {
+            routes.push(targ)
+            streamX1.push(targ)
+          }
+          if ((targ >= 0) && (this.grid[targ].hasChar)) {
+            streamX1.push(targ)
+          }
+        }
+        for (var W = 1; W < this.rows - col; W++) {
+          targ = index + W;
+          if (!streamX2.length) {
+            routes.push(targ)
+            streamX2.push(targ)
+          }
+          if ((targ < this.total) && (this.grid[targ].hasChar)) {
+            streamX2.push(targ)
+          }
+        }
+        for (var N = 1; N < row + 1; N++) {
+          targ = index - (this.rows * N);
+          if (!streamY1.length) {
+            routes.push(targ)
+            streamY1.push(targ)
+          }
+          if ((targ >= 0) && (this.grid[targ].hasChar)) {
+            streamY1.push(targ)
+          }
+        }
+        for (var S = 1; S < this.rows - row; S++) {
+          targ = index + (this.rows * S);
+          if (!streamY2.length) {
+            routes.push(targ)
+            streamY2.push(targ)
+          }
+          if ((targ >= 0) && (this.grid[targ].hasChar)) {
+            streamY2.push(targ)
+          }
+        }
+        for (var nw = 0; nw < col; nw++) {
+          if (nw < 1) {
+            tempNW = index - this.rows - 1;
+            tempSW = index + this.rows - 1
+          } else {
+            tempNW = tempNW - this.rows - 1;
+            tempSW = tempSW + this.rows - 1;
+          }
+          if (!streamNW.length) {
+            inBounds = this.getRange(tempNW);
+            if ((row > 0) && (tempSW < this.total) && (inBounds)) {
+              routes.push(tempNW)
+              streamNW.push(targ)
+            }
+          }
+          if (!streamSW.length) {
+            inBounds = this.getRange(tempSW);
+            console.log('SW is ' + inBounds);
+            if ((row < 7) && (tempSW < this.total) && (inBounds)) {
+              routes.push(tempSW)
+              streamSW.push(targ)
+            }
+          }
+          if (tempSW < this.total)
+            if (this.grid[tempSW].hasChar)
+              streamSW.push(tempSW)
+          if (tempNW > 0)
+            if (this.grid[tempNW].hasChar)
+              streamNW.push(tempNW)
+        }
+        for (var ne = col + 1; ne < this.rows; ne++) {
+          if (ne == col + 1) {
+            tempNE = index - this.rows + 1;
+            tempSE = index + this.rows + 1
+          } else {
+            tempNE = tempNE - this.rows + 1;
+            tempSE = tempSE + this.rows + 1;
+          }
+          if (!streamNE.length) {
+            inBounds = this.getRange(tempNE);
+            if ((row > 0) && (tempNE > 0) && (inBounds)) {
+              routes.push(tempNE)
+              streamNE.push(targ)
+            }
+          }
+          if (!streamSE.length) {
+            inBounds = this.getRange(tempSE);
+            console.log('SE is ' + inBounds);
+            if ((row < 7) && (tempSE < this.total) && (inBounds)) {
+              routes.push(tempSE)
+              streamSE.push(targ)
+            }
+          }
+          if (tempSE < this.total)
+            if (this.grid[tempSE].hasChar)
+              streamSE.push(tempSE)
+          if (tempNE > 0)
+            if (this.grid[tempNE].hasChar)
+              streamNE.push(tempNE)
+        }
       }
       console.log(`Potential move from ${index} to ${routes}`);
       this.showRoutes(routes);

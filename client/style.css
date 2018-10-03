@@ -7,6 +7,7 @@
   --fen-section-rows: 1;
   --fen-inner-cols: 8;
   --fen-inner-rows: 1;
+  --color-selected: #46a0f5;
   --color-A: #232323;
   --color-B: #454545;
   --color-active-A: #323232;
@@ -198,7 +199,7 @@
 
 
 .grid-cell-routeA, .grid-cell-routeB {
-  border: 2px solid green;
+  border: 2px solid var(--color-selected);
 }
 .grid-cell-noPathA, .grid-cell-noPathB {
   border: 2px solid transparent;

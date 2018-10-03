@@ -17,6 +17,9 @@ RKBZQBKR/PPPPPPPP/8/8/8/8/pppppppp/rkbzqbkr
 
 * FEN should be foundational and primary, all else (grid/visuals) secondary
 * read FEN: if pretty (`/[2-9]/`), if ugly (`/\w*\/\w/`), if raw (`/[^\/]/`), then act. All FEN modifications through a singular parser, movements via raw `splice`, translate raw to pretty / ugly
+* FEN self-correction, FEN layers for tile bg and dynamic SVG UI elements
+
+
 * Characters should be movement/stat-based or outsource movement to role components
 * Grid should focus on aesthetic necessities and logic for bounds, have a singular FEN navigator function
 * All movement should be stream-based starting at FENdex

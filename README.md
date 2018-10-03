@@ -2,8 +2,7 @@
 
 ## proto
 
-![](https://thumbs.gfycat.com/ThunderousEnviousBittern-size_restricted.gif)
-`3ZQ3/PPPPPP2/R2B1KP1/7R/K3B1r1/2k2k2/ppppppp1/r1bzqb2`
+![](https://thumbs.gfycat.com/DisguisedLivelyIberiannase-size_restricted.gif)
 
 Reactive CSS Grid UI:
 
