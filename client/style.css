@@ -1,4 +1,5 @@
 :root {
+  font-size: 12px;
   --full-WH: 60vw;
   --cell-WH: 100%;
   --grid-rows: 5;
@@ -19,6 +20,9 @@
   --color-active-team0: #fcfcfc;
   --color-team1: #c62c2c;
   --color-active-team1: #ed2929;
+  font-family: Rubik;
+  color: #a1a1a1;
+  margin: .5rem .25rem 0px .25rem;
   background-color: #323232;
 }
 
